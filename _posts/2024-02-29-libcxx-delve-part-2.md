@@ -5,7 +5,9 @@ categories: [libc++, C++]
 ---
 Before we step into the details of what a floating point is or what the insides of the libc++ code look like, we should take a moment and ask ourselves: what is `from_chars`?
 
-To answer this question we will look at three sources which all contain parts of the answer. First one on the docket: [cppreference](https://en.cppreference.com/w/cpp/utility/from_chars)
+To answer this question we will look at two sources which all contain parts of the answer. First one on the docket:
+
+## [cppreference](https://en.cppreference.com/w/cpp/utility/from_chars)
 
 We find something interesting stuff already. For one, the signature of `from_chars`
 
@@ -51,6 +53,31 @@ There is some other formatting requirements, but those are intrinsic to `from_ch
     - Case insensitive "NAN".
 
 And then we have the return value. When `from_chars` is successful, `value` is equal to `one of at most two floating-point values closest to the value of the string matching the pattern, after rounding according to std::round_to_nearest.` (Again, we will talk about rounding floating-point number in time) and the `ptr` value is either `end` or the first invalid character. Otherwise, `ptr` is first and we return the `invalid_argument` error code. For values too big, we set `ptr` to the first invalid character and return `out_of_range`.
+
+## [P0067R5](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0067r5.html)
+Where it all began: the proposal. This gives a history of string conversion in C and C++ and why `from_chars` came to be. As we can see, the shortcomings come from different areas:
+    - Locale. Respecting local is one of the biggest issue since it requires so much work.
+    - Memory allocation. Allocating memory is *slow* and we would like to avoid it when possible.
+    - Error handling. Some of them do not handle errors, others throw, which, again, slows things down.
+
+So we will have to ensure we do none of those things during `from_chars`. We also see the wording required for our implementation (note that this was before the extended floating-point type proposal):
+```
+struct from_chars_result {
+    const char* ptr;
+    error_code ec;
+  };
+
+  from_chars_result from_chars(const char* first, const char* last, see below& value, int base = 10);  
+
+  from_chars_result from_chars(const char* first, const char* last, float& value, chars_format fmt = chars_format::general);  
+  from_chars_result from_chars(const char* first, const char* last, double& value, chars_format fmt = chars_format::general);  
+  from_chars_result from_chars(const char* first, const char* last, long double& value,  chars_format fmt = chars_format::general);
+```
+
+We also have some functional requirements to keep in mind:
+    1. [first,last) is required to be a valid range. So we need to ensure it is.
+    2. If no characters match the pattern, value is _unmodified_, the member ptr of the return value is first and the member ec is equal to errc::invalid_argument.
+    3. The member ptr of the return value points to the first character not matching the pattern.
 
 ## List of useful links
 - [Floating-point types definition on cppreference](https://en.cppreference.com/w/cpp/language/types)
