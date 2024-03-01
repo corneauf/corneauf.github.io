@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Delving into libc++ - part 2: "from_chars" and the task ahead.
+title: Delving into libc++ - part 2. "from_chars" and the task ahead.
 categories: [libc++, C++]
 ---
 
