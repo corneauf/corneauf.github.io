@@ -10,7 +10,7 @@ To answer this question we will look at two sources which all contain parts of t
 
 ## [cppreference](https://en.cppreference.com/w/cpp/utility/from_chars)
 
-We find something interesting stuff already. For one, the signature of `from_chars`
+We find some interesting stuff already. For one, the signature of `from_chars`
 
 ```
 std::from_chars_result
