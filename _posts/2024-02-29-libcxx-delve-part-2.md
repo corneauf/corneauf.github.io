@@ -1,8 +1,9 @@
 ---
 layout: post
-title: Delving into libc++ - part 2: `from_chars` and the task ahead.
+title: Delving into libc++ - part 2: "from_chars" and the task ahead.
 categories: [libc++, C++]
 ---
+
 Before we step into the details of what a floating point is or what the insides of the libc++ code look like, we should take a moment and ask ourselves: what is `from_chars`?
 
 To answer this question we will look at two sources which all contain parts of the answer. First one on the docket:
